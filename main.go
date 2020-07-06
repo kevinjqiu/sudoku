@@ -4,9 +4,34 @@ import (
 	"os"
 )
 
-type Board []string
+const BoardSize = 9
 
-func (b Board) solve() bool {
+type Board [BoardSize][BoardSize]uint8
+
+func (b *Board) isValid(i, j int, newCh uint8) bool {
+	for _, ch := range b[i] {
+		if newCh == ch {
+			return false
+		}
+	}
+
+	for _, row := range b {
+		if row[j] == newCh {
+			return false
+		}
+	}
+
+	for ii := 3 * (i / 3); ii < 3 * (i / 3) + 3; ii++ {
+		for jj := 3 * (j / 3); jj < 3 * (j / 3) + 3; jj ++ {
+			if b[ii][jj] == newCh {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (b *Board) solve() bool {
 	for i, row := range b {
 		for j, ch := range row {
 			if ch != '.' {
@@ -14,12 +39,16 @@ func (b Board) solve() bool {
 			}
 
 			var newCh uint8
-			for newCh = '1'; newCh < '9'; newCh++ {
-				b[i][j] = newCh
-				if b.solve() {
-					return true
-				} else {
-					b[i][j] = '.'
+			for newCh = '1'; newCh <= '9'; newCh++ {
+				if b.isValid(i, j, newCh) {
+					b[i][j] = newCh
+					//b.print()
+					if b.solve() {
+						return true
+					} else {
+						b[i][j] = '.'
+						//b.print()
+					}
 				}
 			}
 			return false
@@ -36,6 +65,7 @@ func (b Board) print() {
 		}
 		os.Stdout.WriteString("\n")
 	}
+	os.Stdout.WriteString("----------\n")
 }
 
 var board = []string{
@@ -50,8 +80,20 @@ var board = []string{
 "....8..79",
 }
 
+func makeBoard(rows []string) Board {
+	b := Board{}
+
+	for i, row := range rows {
+		for j, ch := range row {
+			b[i][j] = uint8(ch)
+		}
+	}
+
+	return b
+}
+
 func main() {
-	b := Board(board)
+	b := makeBoard(board)
 	b.solve()
 	b.print()
 }
