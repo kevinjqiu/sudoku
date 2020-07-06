@@ -58,12 +58,19 @@ func (b *Board) solve() bool {
 }
 
 func (b Board) print() {
-	for _, row := range b {
-		for _, ch := range row {
+	for i, row := range b {
+		for j, ch := range row {
 			os.Stdout.Write([]byte{byte(ch)})
 			os.Stdout.WriteString(" ")
+			if (j+1) % 3 == 0 {
+				os.Stdout.WriteString(" | ")
+			}
 		}
-		os.Stdout.WriteString("\n")
+		if (i+1) % 3 == 0 {
+			os.Stdout.WriteString("\n--------------------------\n")
+		} else{
+			os.Stdout.WriteString("\n")
+		}
 	}
 	os.Stdout.WriteString("----------\n")
 }
@@ -94,6 +101,7 @@ func makeBoard(rows []string) Board {
 
 func main() {
 	b := makeBoard(board)
+	b.print()
 	b.solve()
 	b.print()
 }
